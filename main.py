@@ -45,6 +45,7 @@ class Player(pg.sprite.Sprite):
         self.rect = self.image.get_rect(center=self.rect.center)
 
 
+
 class Block(pg.sprite.Sprite):
 
     def __init__(self, x, y, width, height):
@@ -54,17 +55,14 @@ class Block(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+
+        # Need orig_pos for camera
         self.orig_pos = (self.rect.x, self.rect.y)
 
     def update(self):
         self.rect.x = self.orig_pos[0] + camera_offset[0]
         self.rect.y = self.orig_pos[1] + camera_offset[1]
 
-
-
-
-def drawSquare(screen, color, xLoc, yLoc, height, width):
-    pg.draw.rect(screen, color, (xLoc, yLoc, width, height))
 
 
 def addAllSprites(all_sprites):
@@ -78,12 +76,16 @@ def addAllSprites(all_sprites):
     all_sprites.add(Block(300, -300, 50, 650))
 
 
+
 def main():
 
     pg.init()
-    gameDisplay = pg.display.set_mode((defs.width, defs.height))
+
+    # Resolution, and fullscreen
+    gameDisplay = pg.display.set_mode((defs.width, defs.height), pg.FULLSCREEN) if cfg.toggle_fullscreen else pg.display.set_mode((defs.width, defs.height))
     pg.display.set_caption(defs.game_name)
     clock = pg.time.Clock()
+
     all_sprites = pg.sprite.Group()
     addAllSprites(all_sprites)
 
@@ -92,11 +94,17 @@ def main():
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 crashed = True
+            if event.type == pg.KEYDOWN and event.key == pg.K_k:
+                crashed = True
 
+        # Update all the sprites, we may need to separate groups later which would complicate things.
         all_sprites.update()
+
+        # Fill before draw so that we have background on the back
         gameDisplay.fill(defs.background_color)
         all_sprites.draw(gameDisplay)
         pg.display.flip()
+
         clock.tick(cfg.target_frame_rate)
 
     pg.quit()

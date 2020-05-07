@@ -14,7 +14,7 @@ class Player(pg.sprite.Sprite):
         self.orig_image = self.image
         self.rect.center = (defs.width / 2, defs.height / 2)
 
-    def update(self, screen):
+    def update(self):
         pressed = pg.key.get_pressed()
         if pressed[pg.K_d]:
             self.rect.x += defs.default_player_velocity
@@ -25,19 +25,18 @@ class Player(pg.sprite.Sprite):
         if pressed[pg.K_w]:
             self.rect.y -= defs.default_player_velocity
 
-        self.rotate(screen)
+        self.rotate()
 
-    def rotate(self, screen):
+    def rotate(self):
         # The vector to the target (the mouse position).
         direction = np.subtract(pg.mouse.get_pos(), self.rect.center)
         # .as_polar gives you the polar coordinates of the vector,
         # i.e. the radius (distance to the target) and the angle.
         angle = (180*math.atan2(direction[0], direction[1]))/math.pi
         # Rotate the image by the negative angle (y-axis in pygame is flipped).
-        self.image = pg.transform.rotate(self.orig_image, -angle)
+        self.image = pg.transform.rotozoom(self.orig_image, angle, 1)
         # Create a new rect with the center of the old rect.
         self.rect = self.image.get_rect(center=self.rect.center)
-        screen.blit(self.image, self.rect)
 
 
 def drawSquare(screen, color, xLoc, yLoc, height, width):
@@ -62,7 +61,7 @@ def main():
             if event.type == pg.QUIT:
                 crashed = True
 
-        player.update(gameDisplay)
+        all_sprites.update()
         gameDisplay.fill(defs.background_color)
         all_sprites.draw(gameDisplay)
         pg.display.flip()

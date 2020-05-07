@@ -1,3 +1,3 @@
 
 
-target_frame_rate = 144
+target_frame_rate = 10

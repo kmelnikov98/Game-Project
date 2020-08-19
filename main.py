@@ -4,6 +4,7 @@ import numpy as np
 import math
 import defs
 
+wall_sprites = pg.sprite.Group()
 camera_offset = [defs.width / 2, defs.height / 2]
 
 class Player(pg.sprite.Sprite):
@@ -20,6 +21,7 @@ class Player(pg.sprite.Sprite):
     def update(self):
         global camera_offset
         pressed = pg.key.get_pressed()
+
         if pressed[pg.K_d]:
             self.orig_pos[0] += defs.default_player_velocity
         if pressed[pg.K_a]:
@@ -29,9 +31,15 @@ class Player(pg.sprite.Sprite):
         if pressed[pg.K_w]:
             self.orig_pos[1] -= defs.default_player_velocity
 
+
         camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
         self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])
         self.rotate()
+
+        gets_hit = pg.sprite.spritecollide(self, wall_sprites, True)
+        if gets_hit:
+            print("Collide")
+
 
     def rotate(self):
         # The vector to the target (the mouse position).
@@ -70,11 +78,12 @@ def addAllSprites(all_sprites):
     all_sprites.add(Player())
 
     # Add Blocks (x, y, width, height)
-    all_sprites.add(Block(-300, -300, 600, 50))
-    all_sprites.add(Block(-300, -300, 50, 600))
-    all_sprites.add(Block(-300, 300, 600, 50))
-    all_sprites.add(Block(300, -300, 50, 650))
+    wall_sprites.add(Block(-300, -300, 600, 50))
+    wall_sprites.add(Block(-300, -300, 50, 600))
+    wall_sprites.add(Block(-300, 300, 600, 50))
+    wall_sprites.add(Block(300, -300, 50, 650))
 
+    all_sprites.add(*wall_sprites)
 
 
 def main():
@@ -97,6 +106,8 @@ def main():
             if event.type == pg.KEYDOWN and event.key == pg.K_k:
                 crashed = True
 
+
+
         # Update all the sprites, we may need to separate groups later which would complicate things.
         all_sprites.update()
 
@@ -104,7 +115,6 @@ def main():
         gameDisplay.fill(defs.background_color)
         all_sprites.draw(gameDisplay)
         pg.display.flip()
-
         clock.tick(cfg.target_frame_rate)
 
     pg.quit()

@@ -18,27 +18,52 @@ class Player(pg.sprite.Sprite):
         self.rect.center = (0, 0)
         self.orig_pos = [self.rect.center[0], self.rect.center[1]]
 
+    def check_collisions(self, collisions, x_velocity, y_velocity):
+
+        if collisions:
+            if x_velocity < 0:
+                self.orig_pos[0] = collisions[0].rect.x + collisions[0].rect.w
+
+            if x_velocity > 0:
+                self.orig_pos[0] = collisions[0].rect.x - self.rect.w
+
+            if y_velocity < 0:
+                self.orig_pos[1]= collisions[0].rect.y + collisions[0].rect.h
+
+            if y_velocity > 0:
+                self.orig_pos[1]= collisions[0].rect.y - self.rect.h
+
+
     def update(self):
         global camera_offset
         pressed = pg.key.get_pressed()
-
+        x_velocity = 0
+        y_velocity = 0
         if pressed[pg.K_d]:
             self.orig_pos[0] += defs.default_player_velocity
+            x_velocity = defs.default_player_velocity
         if pressed[pg.K_a]:
             self.orig_pos[0] -= defs.default_player_velocity
+            x_velocity = -defs.default_player_velocity
         if pressed[pg.K_s]:
             self.orig_pos[1] += defs.default_player_velocity
+            y_velocity = defs.default_player_velocity
         if pressed[pg.K_w]:
             self.orig_pos[1] -= defs.default_player_velocity
+            y_velocity = -defs.default_player_velocity
+
+        camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
+        self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])
+        self.rotate()
 
 
         camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
         self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])
         self.rotate()
 
-        gets_hit = pg.sprite.spritecollide(self, wall_sprites, True)
-        if gets_hit:
-            print("Collide")
+        collision_list = pg.sprite.spritecollide(self, wall_sprites, False)
+        self.check_collisions(collision_list, x_velocity, y_velocity)
+
 
 
     def rotate(self):

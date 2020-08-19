@@ -18,20 +18,20 @@ class Player(pg.sprite.Sprite):
         self.rect.center = (0, 0)
         self.orig_pos = [self.rect.center[0], self.rect.center[1]]
 
-    def check_collisions(self, collisions, x_velocity, y_velocity):
+    def check_collisions(self, collisions, x_velocity, y_velocity, position_before):
 
         if collisions:
             if x_velocity < 0:
-                self.orig_pos[0] = collisions[0].rect.x + collisions[0].rect.w
+                self.orig_pos[0] = position_before[0] + 1
 
             if x_velocity > 0:
-                self.orig_pos[0] = collisions[0].rect.x - self.rect.w
+                self.orig_pos[0] = position_before[0] - 1
 
             if y_velocity < 0:
-                self.orig_pos[1]= collisions[0].rect.y + collisions[0].rect.h
+                self.orig_pos[1]= position_before[1] + 1
 
             if y_velocity > 0:
-                self.orig_pos[1]= collisions[0].rect.y - self.rect.h
+                self.orig_pos[1] = position_before[1] - 1
 
 
     def update(self):
@@ -39,6 +39,7 @@ class Player(pg.sprite.Sprite):
         pressed = pg.key.get_pressed()
         x_velocity = 0
         y_velocity = 0
+        position_before = self.orig_pos.copy()
         if pressed[pg.K_d]:
             self.orig_pos[0] += defs.default_player_velocity
             x_velocity = defs.default_player_velocity
@@ -52,17 +53,16 @@ class Player(pg.sprite.Sprite):
             self.orig_pos[1] -= defs.default_player_velocity
             y_velocity = -defs.default_player_velocity
 
-        camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
-        self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])
-        self.rotate()
-
-
-        camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
-        self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])
-        self.rotate()
-
         collision_list = pg.sprite.spritecollide(self, wall_sprites, False)
-        self.check_collisions(collision_list, x_velocity, y_velocity)
+        self.check_collisions(collision_list, x_velocity, y_velocity, position_before)
+
+        camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
+        self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])
+        self.rotate()
+
+        camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
+        self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])
+        self.rotate()
 
 
 

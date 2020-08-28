@@ -5,6 +5,7 @@ import math
 import defs
 
 wall_sprites = pg.sprite.Group()
+enemy_sprites = pg.sprite.Group()
 camera_offset = [defs.width / 2, defs.height / 2]
 
 class Player(pg.sprite.Sprite):
@@ -97,6 +98,25 @@ class Block(pg.sprite.Sprite):
         self.rect.y = self.orig_pos[1] + camera_offset[1]
 
 
+class Enemy(pg.sprite.Sprite):
+
+        def __init__(self, x, y, width, height):
+            pg.sprite.Sprite.__init__(self)
+            self.image = pg.Surface((width, height))
+            self.image.fill(defs.RED)
+            self.rect = self.image.get_rect()
+            self.rect.x = x
+            self.rect.y = y
+
+            # Need orig_pos for camera
+            self.orig_pos = [self.rect.x, self.rect.y]
+
+        def update(self):
+            self.orig_pos[0] += 2
+            self.rect.x = self.orig_pos[0] + camera_offset[0]
+            self.rect.y = self.orig_pos[1] + camera_offset[1]
+
+
 
 def addAllSprites(all_sprites):
     # Add Player
@@ -107,8 +127,10 @@ def addAllSprites(all_sprites):
     wall_sprites.add(Block(-300, -300, 50, 600))
     wall_sprites.add(Block(-300, 300, 600, 50))
     wall_sprites.add(Block(300, -300, 50, 650))
+    enemy_sprites.add(Enemy(100, 400, 100, 100))
 
     all_sprites.add(*wall_sprites)
+    all_sprites.add(*enemy_sprites)
 
 
 def main():

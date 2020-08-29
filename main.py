@@ -54,8 +54,10 @@ class Player(pg.sprite.Sprite):
             self.orig_pos[1] -= defs.default_player_velocity
             y_velocity = -defs.default_player_velocity
 
-        collision_list = pg.sprite.spritecollide(self, wall_sprites, False)
-        self.check_collisions(collision_list, x_velocity, y_velocity, position_before)
+        wall_collision_list = pg.sprite.spritecollide(self, wall_sprites, False)
+        self.check_collisions(wall_collision_list, x_velocity, y_velocity, position_before)
+
+        enemy_collision_list = pg.sprite.spritecollide(self, enemy_sprites, True)
 
         camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
         self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])

@@ -3,6 +3,8 @@ import config as cfg
 import numpy as np
 import math
 import defs
+import text
+import strings
 
 wall_sprites = pg.sprite.Group()
 enemy_sprites = pg.sprite.Group()
@@ -138,7 +140,7 @@ def addAllSprites(all_sprites):
 def main():
 
     pg.init()
-
+    large_text = text.TextUI(strings.test_str, defs.large_font, defs.large_font_size, defs.WHITE)
     # Resolution, and fullscreen
     gameDisplay = pg.display.set_mode((defs.width, defs.height), pg.FULLSCREEN) if cfg.toggle_fullscreen else pg.display.set_mode((defs.width, defs.height))
     pg.display.set_caption(defs.game_name)
@@ -146,6 +148,7 @@ def main():
 
     all_sprites = pg.sprite.Group()
     addAllSprites(all_sprites)
+
 
     crashed = False
     while not crashed:
@@ -155,16 +158,17 @@ def main():
             if event.type == pg.KEYDOWN and event.key == pg.K_k:
                 crashed = True
 
-
-
         # Update all the sprites, we may need to separate groups later which would complicate things.
+        large_text.message_display(gameDisplay)
         all_sprites.update()
 
         # Fill before draw so that we have background on the back
+        pg.display.update()
         gameDisplay.fill(defs.background_color)
         all_sprites.draw(gameDisplay)
         pg.display.flip()
         clock.tick(cfg.target_frame_rate)
+
 
     pg.quit()
     quit()

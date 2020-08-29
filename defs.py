@@ -30,3 +30,8 @@ UP = 1
 
 #Player
 player_size = (70, 70)
+
+
+# Text
+large_font = 'freesansbold.ttf'
+large_font_size = 115

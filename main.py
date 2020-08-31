@@ -25,18 +25,18 @@ class Player(pg.sprite.Sprite):
 
     def check_collisions(self, collisions, x_velocity, y_velocity, position_before):
 
-        if collisions:
-            if x_velocity < 0:
-                self.orig_pos[0] = position_before[0] + 1
+        for collision in collisions:
+            if x_velocity < 0 and abs(collision.rect.right - camera_offset[0] - self.orig_pos[0] + (self.rect.width / 2.5)) <= defs.default_player_velocity:
+                self.orig_pos[0] = collision.rect.right + (self.rect.width / 2) - camera_offset[0] - 1
 
-            if x_velocity > 0:
-                self.orig_pos[0] = position_before[0] - 1
+            if x_velocity > 0 and abs(collision.rect.left - camera_offset[0] - self.orig_pos[0] - (self.rect.width / 2.5)) <= defs.default_player_velocity:
+                self.orig_pos[0] = collision.rect.left - (self.rect.width / 2) - camera_offset[0] + 1
 
-            if y_velocity < 0:
-                self.orig_pos[1]= position_before[1] + 1
+            if y_velocity < 0 and abs(collision.rect.bottom - camera_offset[1] - self.orig_pos[1] + (self.rect.height / 2.5)) <= defs.default_player_velocity:
+                self.orig_pos[1] = collision.rect.bottom + (self.rect.height / 2) - camera_offset[1] - 1
 
-            if y_velocity > 0:
-                self.orig_pos[1] = position_before[1] - 1
+            if y_velocity > 0 and abs(collision.rect.top - camera_offset[1] - self.orig_pos[1] - (self.rect.height / 2.5)) <= defs.default_player_velocity:
+                self.orig_pos[1] = collision.rect.top - (self.rect.height / 2) - camera_offset[1] + 1
 
 
     def update(self):
@@ -66,10 +66,6 @@ class Player(pg.sprite.Sprite):
             for enemies_collided in enemy_collision_list:
                 player_info.player_kill_counter()
                 print(player_info.kill_counter)
-
-        camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
-        self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])
-        self.rotate()
 
         camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
         self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])

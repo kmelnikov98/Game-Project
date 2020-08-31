@@ -32,6 +32,8 @@ UP = 1
 player_size = (70, 70)
 
 
-# Text
+# Text parameters
 large_font = 'freesansbold.ttf'
 large_font_size = 115
+kill_font_size = 35
+kill_font = 'freesansbold.ttf'

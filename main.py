@@ -5,10 +5,12 @@ import math
 import defs
 import text
 import strings
+import playerInfo
 
 wall_sprites = pg.sprite.Group()
 enemy_sprites = pg.sprite.Group()
 camera_offset = [defs.width / 2, defs.height / 2]
+player_info = playerInfo.PlayerInfo(0)
 
 class Player(pg.sprite.Sprite):
 
@@ -60,6 +62,10 @@ class Player(pg.sprite.Sprite):
         self.check_collisions(wall_collision_list, x_velocity, y_velocity, position_before)
 
         enemy_collision_list = pg.sprite.spritecollide(self, enemy_sprites, True)
+        if enemy_collision_list:
+            for enemies_collided in enemy_collision_list:
+                player_info.player_kill_counter()
+                print(player_info.kill_counter)
 
         camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
         self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])
@@ -68,7 +74,6 @@ class Player(pg.sprite.Sprite):
         camera_offset = [defs.width / 2 - self.orig_pos[0], defs.height / 2 - self.orig_pos[1]]
         self.rect.center = (self.orig_pos[0] + camera_offset[0], self.orig_pos[1] + camera_offset[1])
         self.rotate()
-
 
 
     def rotate(self):
@@ -130,7 +135,6 @@ def addAllSprites(all_sprites):
     wall_sprites.add(Block(-300, -300, 600, 50))
     wall_sprites.add(Block(-300, -300, 50, 600))
     wall_sprites.add(Block(-300, 300, 600, 50))
-    wall_sprites.add(Block(300, -300, 50, 650))
     enemy_sprites.add(Enemy(100, 400, 100, 100))
 
     all_sprites.add(*wall_sprites)
@@ -140,15 +144,17 @@ def addAllSprites(all_sprites):
 def main():
 
     pg.init()
-    large_text = text.TextUI(strings.test_str, defs.large_font, defs.large_font_size, defs.WHITE)
     # Resolution, and fullscreen
     gameDisplay = pg.display.set_mode((defs.width, defs.height), pg.FULLSCREEN) if cfg.toggle_fullscreen else pg.display.set_mode((defs.width, defs.height))
     pg.display.set_caption(defs.game_name)
     clock = pg.time.Clock()
 
+    # init/add the sprites
     all_sprites = pg.sprite.Group()
     addAllSprites(all_sprites)
 
+    # Call the UI that needs to be displayed, related to the player
+    kill_text = text.TextUI(defs.kill_font, defs.kill_font_size, defs.WHITE, playerInfo.kill_position_x, playerInfo.kill_position_y)
 
     crashed = False
     while not crashed:
@@ -159,21 +165,19 @@ def main():
                 crashed = True
 
         # Update all the sprites, we may need to separate groups later which would complicate things.
-        large_text.message_display(gameDisplay)
         all_sprites.update()
 
         # Fill before draw so that we have background on the back
         pg.display.update()
         gameDisplay.fill(defs.background_color)
         all_sprites.draw(gameDisplay)
+        kill_text.message_display(strings.kill_counter_str + str(player_info.kill_counter), gameDisplay)
         pg.display.flip()
         clock.tick(cfg.target_frame_rate)
-
 
     pg.quit()
     quit()
     return 0
-
 
 if __name__=='__main__':
     main()
